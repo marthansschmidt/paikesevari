@@ -1,0 +1,50 @@
+.circular-logo {
+  position: relative;
+  width: clamp(132px, 12vw, 190px);
+  height: clamp(132px, 12vw, 190px);
+  flex: 0 0 auto;
+}
+
+.circular-text {
+  margin: 0 auto;
+  border-radius: 50%;
+  width: 100%;
+  position: relative;
+  height: 100%;
+  color: var(--ink);
+  font-weight: 900;
+  text-align: center;
+  cursor: pointer;
+  transform-origin: 50% 50%;
+  -webkit-transform-origin: 50% 50%;
+}
+
+.circular-text span {
+  position: absolute;
+  display: inline-block;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  font-size: clamp(0.78rem, 0.9vw, 1rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.5s cubic-bezier(0, 0, 0, 1);
+}
+
+.circular-logo-center {
+  position: absolute;
+  inset: 28%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(245, 235, 224, 0.6);
+  box-shadow: 0 14px 34px rgba(45, 40, 37, 0.12);
+}
+
+.circular-logo-center img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  display: block;
+}
