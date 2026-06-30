@@ -69,7 +69,7 @@ export const StaggeredMenu = ({
       if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: menuButtonColor });
     });
     return () => ctx.revert();
-  }, [menuButtonColor, position]);
+  }, [position]);
 
   const buildOpenTimeline = useCallback(() => {
     const panel = panelRef.current;
@@ -263,6 +263,23 @@ export const StaggeredMenu = ({
       ease: "power4.out",
     });
   }, []);
+
+  React.useEffect(() => {
+    const btn = toggleBtnRef.current;
+    if (!btn || openRef.current) return undefined;
+
+    colorTweenRef.current?.kill();
+    colorTweenRef.current = gsap.to(btn, {
+      color: menuButtonColor,
+      duration: 0.45,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+
+    return () => {
+      colorTweenRef.current?.kill();
+    };
+  }, [menuButtonColor]);
 
   const closeMenu = useCallback(() => {
     if (openRef.current) {

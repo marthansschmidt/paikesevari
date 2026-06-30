@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import ClickSpark from "./ClickSpark";
 import CircularText from "./CircularText";
@@ -9,26 +9,33 @@ import heroImage from "./assets/hero-terrace.png";
 import logoImage from "./assets/paikesevari_logo_transparent.png";
 import pilt3Image from "./assets/pilt3.png";
 import mhxLogo from "./assets/mhx_logo.png";
+import arbuusImage from "./assets/arbuus.png";
+import arbuus2Image from "./assets/arbuus2.png";
+import neonImage from "./assets/neon.png";
+import previewVideo from "./prev.mp4";
 import "./style.css";
 
 const products = [
   {
-    name: "Rannavari Classic",
-    description: "Kerge, värvikas ja lihtsalt kaasavõetav vari rannapäevadeks.",
+    name: "Arbuusimustriga päikesevari",
+    description: "Lõbus arbuusimustriga rannavari, mida on lihtne kaasa võtta randa, piknikule või suvisele väljasõidule.",
     price: "49 €",
     imageClass: "beach",
+    image: arbuusImage,
   },
   {
-    name: "Terrassivari Premium",
-    description: "Elegantne ja stabiilne lahendus terrassile või kohvikualale.",
+    name: "Siniroheline päikesevari",
+    description: "Elegantne sinirohelise tooniga päikesevari, mis sobib hästi terrassile, aeda või kohvikualale.",
     price: "189 €",
     imageClass: "terrace",
+    image: neonImage,
   },
   {
-    name: "Kokkupandav Matkavari",
-    description: "Kompaktne vari matkale, piknikule ja väikesele rõdule.",
+    name: "Arbuusi korgiavaja",
+    description: "Mängulise arbuusikujulise disainiga korgiavaja, mis sobib suvistele koosviibimistele, grillipeole või kingituseks.",
     price: "69 €",
     imageClass: "travel",
+    image: arbuus2Image,
   },
   {
     name: "Suur Aia Päikesevari",
@@ -66,6 +73,18 @@ const menuItems = [
   { label: "Tooted", ariaLabel: "Mine värviblokini", link: "#varviblokk" },
   { label: "Kontakt", ariaLabel: "Mine rannasektsioonini", link: "#rand" },
 ];
+
+function SlideInText({ text }) {
+  return (
+    <span className="slide-in-text" aria-label={text}>
+      {text.split("").map((char, index) => (
+        <span className="slide-in-char" style={{ "--char-delay": `${index * 0.03}s` }} aria-hidden="true" key={`${char}-${index}`}>
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 function Header({ isScrolled }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -119,7 +138,7 @@ function Hero({ scrollProgress }) {
   return (
     <section className="hero cinematic-hero section-reveal" id="avaleht">
       <a className="hero-logo" href="#avaleht" aria-label="PäikeseVari avaleht">
-        <CircularText text="SUNRISE*FM*" spinDuration={30} onHover="goBonkers">
+        <CircularText text="Päikese*Varjus*" spinDuration={30} onHover="goBonkers">
           <img src={logoImage} alt="" />
         </CircularText>
       </a>
@@ -173,26 +192,148 @@ function ImageSection({ image, label, title, text, align = "left", id }) {
     <section className={`visual-section visual-section-${align} section-reveal`} id={id}>
       <div className="visual-section-image" style={{ backgroundImage: `url(${image})` }}></div>
       <div className="visual-section-shade"></div>
-      <div className="visual-section-content">
-        <p className="eyebrow">{label}</p>
-        <h2>{title}</h2>
-        <p>{text}</p>
+      <div className="visual-section-video-card" aria-label="Päikesevarju eelvaade">
+        <video src={previewVideo} autoPlay muted loop playsInline preload="metadata"></video>
       </div>
     </section>
   );
 }
 
+function ProductPreviewCarousel({ products: previewProducts }) {
+  const [activeIndex, setActiveIndex] = useState(() => {
+    const classicIndex = previewProducts.findIndex((product) => product.name === "Arbuusimustriga päikesevari");
+
+    return classicIndex >= 0 ? classicIndex : 0;
+  });
+  const [isPaused, setIsPaused] = useState(false);
+  const dragStartRef = useRef(null);
+
+  const changeSlide = (nextIndex) => {
+    setActiveIndex((nextIndex + previewProducts.length) % previewProducts.length);
+  };
+
+  useEffect(() => {
+    if (isPaused || previewProducts.length < 2) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((currentIndex) => (currentIndex + 1) % previewProducts.length);
+    }, 8000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [isPaused, previewProducts.length]);
+
+  const handlePointerDown = (event) => {
+    dragStartRef.current = event.clientX;
+  };
+
+  const handlePointerUp = (event) => {
+    if (dragStartRef.current === null) {
+      return;
+    }
+
+    const dragOffset = event.clientX - dragStartRef.current;
+    dragStartRef.current = null;
+
+    if (dragOffset > 70) {
+      changeSlide(activeIndex - 1);
+    }
+
+    if (dragOffset < -70) {
+      changeSlide(activeIndex + 1);
+    }
+  };
+
+  return (
+    <div
+      className="product-preview-carousel"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div
+        className="product-preview-stage"
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={() => {
+          dragStartRef.current = null;
+        }}
+      >
+        {previewProducts.map((product, index) => {
+          let offset = index - activeIndex;
+
+          if (offset > previewProducts.length / 2) {
+            offset -= previewProducts.length;
+          } else if (offset < -previewProducts.length / 2) {
+            offset += previewProducts.length;
+          }
+
+          const isVisible = Math.abs(offset) <= 1;
+
+          return (
+            <article
+              className="product-card product-card-featured product-preview-slide"
+              key={product.name}
+              data-offset={offset}
+              style={{
+                "--slide-scale": offset === 0 ? 1 : 0.82,
+                "--slide-opacity": isVisible ? 1 : 0,
+                "--slide-z": previewProducts.length - Math.abs(offset),
+              }}
+            >
+              <div className={`product-image ${product.imageClass} ${product.image ? "has-product-photo" : ""}`}>
+                {product.image ? <img src={product.image} alt="" /> : null}
+              </div>
+              <div className="product-body">
+                <h3>{product.name}</h3>
+                <p>{product.description}</p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="product-preview-controls" aria-label="Toodete karusselli juhtnupud">
+        <button type="button" onClick={() => changeSlide(activeIndex - 1)} aria-label="Eelmine toode">
+          <span aria-hidden="true">‹</span>
+        </button>
+        <div className="product-preview-dots" aria-label="Toote valik">
+          {previewProducts.map((product, index) => (
+            <button
+              className={activeIndex === index ? "is-active" : ""}
+              type="button"
+              key={product.name}
+              onClick={() => changeSlide(index)}
+              aria-label={`Vali ${product.name}`}
+            ></button>
+          ))}
+        </div>
+        <button type="button" onClick={() => changeSlide(activeIndex + 1)} aria-label="Järgmine toode">
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ColorIntro() {
+  const featuredProducts = [products[1], products[0], products[2]];
+
   return (
     <section className="color-intro section-reveal" id="varviblokk" aria-label="PäikeseVari värviblokk">
       <CurvedLoop
-        marqueeText="Naudi suve varjus ✦ Naudi suve varjus ✦ Naudi suve varjus ✦"
+        marqueeText="LEIA SOBIV VARI ✦ NAUDI SUVE IGAS HETKES ✦ MUUDA ÕUEALA HUBASEKS ✦"
         speed={0.5}
         curveAmount={0}
         direction="left"
         interactive={true}
         className="curved-text"
       />
+      <div className="color-intro-products" aria-label="Esiletõstetud tooted">
+        <ProductPreviewCarousel products={featuredProducts} />
+      </div>
     </section>
   );
 }
@@ -209,11 +350,12 @@ function Products({ onProductInquiry }) {
       <div className="product-grid">
         {products.map((product) => (
           <article className="product-card" key={product.name}>
-            <div className={`product-image ${product.imageClass}`}></div>
+            <div className={`product-image ${product.imageClass} ${product.image ? "has-product-photo" : ""}`}>
+              {product.image ? <img src={product.image} alt="" /> : null}
+            </div>
             <div className="product-body">
               <h3>{product.name}</h3>
               <p>{product.description}</p>
-              <strong>{product.price}</strong>
               <button className="btn btn-secondary" type="button" onClick={() => onProductInquiry(product.name)}>
                 Lisa päringusse
               </button>
@@ -359,6 +501,21 @@ function Footer() {
 
 function App() {
   const [heroScrollProgress, setHeroScrollProgress] = useState(0);
+  const [isMenuOnDarkBackground, setIsMenuOnDarkBackground] = useState(true);
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "auto";
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }, 120);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   useEffect(() => {
     const revealElements = document.querySelectorAll(".section-reveal");
@@ -398,6 +555,38 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    let frameId = 0;
+
+    const updateMenuTone = () => {
+      window.cancelAnimationFrame(frameId);
+
+      frameId = window.requestAnimationFrame(() => {
+        const menuY = Math.min(72, window.innerHeight * 0.16);
+        const darkSections = document.querySelectorAll(".cinematic-hero, .visual-section, .site-footer");
+        const nextIsDark = Array.from(darkSections).some((section) => {
+          const rect = section.getBoundingClientRect();
+
+          return rect.top <= menuY && rect.bottom >= menuY;
+        });
+
+        setIsMenuOnDarkBackground(nextIsDark);
+      });
+    };
+
+    updateMenuTone();
+    window.addEventListener("scroll", updateMenuTone, { passive: true });
+    window.addEventListener("resize", updateMenuTone);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", updateMenuTone);
+      window.removeEventListener("resize", updateMenuTone);
+    };
+  }, []);
+
+  const menuButtonColor = isMenuOnDarkBackground ? "#f5ebe0" : "#2d2825";
+
   return (
     <ClickSpark sparkColor="#8b6f47" sparkSize={12} sparkRadius={24} sparkCount={9} duration={520} extraScale={1.15}>
       <StaggeredMenu
@@ -406,7 +595,7 @@ function App() {
         items={menuItems}
         displaySocials={false}
         displayItemNumbering
-        menuButtonColor="#2d2825"
+        menuButtonColor={menuButtonColor}
         openMenuButtonColor="#2d2825"
         changeMenuColorOnOpen
         colors={["#EDEDE9", "#D6CCC2", "#E3D5CA", "#D5BDAF"]}
