@@ -5,6 +5,7 @@ import CircularText from "./CircularText";
 import StaggeredMenu from "./StaggeredMenu";
 import Ferrofluid from "./Ferrofluid";
 import CurvedLoop from "./CurvedLoop";
+import RotatingText from "./RotatingText";
 import heroImage from "./assets/hero-terrace.png";
 import logoImage from "./assets/paikesevari_logo_transparent.png";
 import pilt3Image from "./assets/pilt3.png";
@@ -137,11 +138,25 @@ function Header({ isScrolled }) {
 function Hero({ scrollProgress }) {
   return (
     <section className="hero cinematic-hero section-reveal" id="avaleht">
-      <a className="hero-logo" href="#avaleht" aria-label="PäikeseVari avaleht">
-        <CircularText text="Päikese*Varjus*" spinDuration={30} onHover="goBonkers">
-          <img src={logoImage} alt="" />
-        </CircularText>
-      </a>
+      <div className="hero-brand-lockup">
+        <h1 className="hero-split-title hero-rotating-title">
+          <span>Suvevari</span>
+          <RotatingText
+            texts={["terrassile", "aeda", "randa"]}
+            mainClassName="hero-rotating-word"
+            splitLevelClassName="hero-rotating-word-part"
+            elementLevelClassName="hero-rotating-letter"
+            splitBy="characters"
+            staggerFrom="center"
+            staggerDuration={0.018}
+            rotationInterval={2200}
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "-120%", opacity: 0 }}
+            transition={{ type: "spring", damping: 28, stiffness: 380 }}
+          />
+        </h1>
+      </div>
       <div
         className="hero-image-layer"
         style={{
@@ -184,6 +199,16 @@ function Hero({ scrollProgress }) {
         <small>Keri</small>
       </div>
     </section>
+  );
+}
+
+function FixedLogo({ isCompact }) {
+  return (
+    <a className={`hero-logo ${isCompact ? "is-compact" : ""}`} href="#avaleht" aria-label="PäikeseVari avaleht">
+      <CircularText text="Ranna*Vari*" spinDuration={30} onHover="goBonkers">
+        <img src={logoImage} alt="" />
+      </CircularText>
+    </a>
   );
 }
 
@@ -589,6 +614,7 @@ function App() {
 
   return (
     <ClickSpark sparkColor="#8b6f47" sparkSize={12} sparkRadius={24} sparkCount={9} duration={520} extraScale={1.15}>
+      <FixedLogo isCompact={heroScrollProgress > 0.18} />
       <StaggeredMenu
         position="right"
         isFixed
