@@ -1559,19 +1559,39 @@ h3 {
   }
 
   .product-preview-stage {
-    height: 520px;
+    height: 500px;
   }
 
   .product-preview-slide {
-    width: min(84%, 360px);
+    width: min(80%, 360px);
+  }
+
+  .product-preview-slide[data-offset="0"] {
+    height: calc(100% - 12px);
   }
 
   .product-preview-slide[data-offset="-1"] {
-    transform: translateX(-102%) scale(var(--slide-scale));
+    transform: translateX(-118%) scale(var(--slide-scale));
   }
 
   .product-preview-slide[data-offset="1"] {
-    transform: translateX(2%) scale(var(--slide-scale));
+    transform: translateX(18%) scale(var(--slide-scale));
+  }
+
+  .product-preview-slide:not([data-offset="0"]) {
+    top: 68px;
+    width: min(54%, 240px);
+    height: 230px;
+    pointer-events: none;
+  }
+
+  .product-preview-slide:not([data-offset="0"]) .product-image {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .product-preview-slide:not([data-offset="0"]) .product-body {
+    display: none;
   }
 
   .product-preview-controls {
