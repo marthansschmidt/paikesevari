@@ -620,7 +620,7 @@ function App() {
         isFixed
         items={menuItems}
         displaySocials={false}
-        displayItemNumbering
+        displayItemNumbering={false}
         menuButtonColor={menuButtonColor}
         openMenuButtonColor="#2d2825"
         changeMenuColorOnOpen

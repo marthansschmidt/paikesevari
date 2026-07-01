@@ -11,13 +11,15 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100svh;
+  height: 100dvh;
   z-index: 70;
   overflow: hidden;
 }
 
 .staggered-menu-header {
   position: absolute;
-  top: 0;
+  top: env(safe-area-inset-top, 0);
   left: 0;
   width: 100%;
   display: flex;
@@ -70,8 +72,8 @@
   height: 1em;
   overflow: hidden;
   white-space: nowrap;
-  width: 54px;
-  min-width: 54px;
+  width: 68px;
+  min-width: 68px;
 }
 
 .sm-toggle-textInner {
@@ -254,12 +256,25 @@
 }
 
 @media (max-width: 760px) {
+  .staggered-menu-header {
+    padding: calc(env(safe-area-inset-top, 0) + 18px) 18px 18px;
+  }
+
+  .sm-toggle {
+    min-height: 48px;
+    padding: 0 14px;
+  }
+
   .sm-prelayers,
   .staggered-menu-panel {
     width: 100%;
   }
 
   .staggered-menu-panel {
-    padding: 112px 22px 34px;
+    padding: calc(env(safe-area-inset-top, 0) + 116px) 22px 34px;
+  }
+
+  .sm-panel-list[data-numbering] .sm-panel-item::after {
+    display: none;
   }
 }
